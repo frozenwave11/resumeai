@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ResumeAI — Craft Your Career</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,300&family=DM+Mono:wght@300;400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  /* ── Variables ─────────────────────────────────────────────────── */
+  :root {
+    --bg:       #0c0c0e;
+    --surface:  #131316;
+    --border:   #222228;
+    --muted:    #3a3a44;
+    --text:     #e8e6f0;
+    --sub:      #888898;
+    --accent:   #c8f060;
+    --accent2:  #60c8f0;
+    --accent3:  #f0a060;
+    --danger:   #f06060;
+    --card-bg:  #17171c;
+    --radius:   12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grain overlay ─────────────────────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* ── Layout ────────────────────────────────────────────────────── */
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ── Header ────────────────────────────────────────────────────── */
+  header {
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .logo {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-dot { color: var(--accent); }
+  .tagline { color: var(--sub); font-size: 0.85rem; margin-top: 6px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* ── Tabs ──────────────────────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
+    width: fit-content;
+  }
+  .tab {
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--sub);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .tab.active {
+    background: var(--card-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* ── Panels ────────────────────────────────────────────────────── */
+  .panel { display: none; animation: fadeUp 0.35s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Two-column grid ───────────────────────────────────────────── */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── Cards ─────────────────────────────────────────────────────── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .card-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--sub);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Textarea / Input ──────────────────────────────────────────── */
+  textarea, input[type="text"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 300;
+    padding: 14px;
+    resize: vertical;
+    transition: border-color 0.2s;
+    line-height: 1.7;
+  }
+  textarea:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--muted);
+  }
+  textarea::placeholder, input::placeholder { color: var(--muted); }
+
+  /* ── PDF drop zone ─────────────────────────────────────────────── */
+  .drop-zone {
+    border: 1.5px dashed var(--muted);
+    border-radius: 8px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.drag { border-color: var(--accent); background: rgba(200,240,96,0.03); }
+  .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .drop-icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .drop-text { font-size: 0.83rem; color: var(--sub); }
+  .drop-text span { color: var(--accent); }
+  .drop-filename { font-size: 0.78rem; color: var(--accent); margin-top: 6px; font-family: 'DM Mono', monospace; }
+
+  /* ── Select ────────────────────────────────────────────────────── */
+  select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    padding: 10px 14px;
+    width: 100%;
+    cursor: pointer;
+  }
+  select:focus { outline: none; border-color: var(--muted); }
+
+  /* ── Buttons ───────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0c0c0e;
+  }
+  .btn-primary:hover { background: #d4f570; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--muted); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+  .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 20px; }
+
+  /* ── Loading spinner ───────────────────────────────────────────── */
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-top-color: #0c0c0e;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Output area ───────────────────────────────────────────────── */
+  .output-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 28px;
+    display: none;
+  }
+  .output-card.visible { display: block; animation: fadeUp 0.3s ease; }
+  .output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .output-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--sub);
+  }
+  .output-actions { display: flex; gap: 8px; }
+  .btn-icon {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--sub);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-icon:hover { color: var(--text); border-color: var(--muted); }
+  .output-body {
+    padding: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.79rem;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    max-height: 520px;
+    overflow-y: auto;
+  }
+  .output-body::-webkit-scrollbar { width: 4px; }
+  .output-body::-webkit-scrollbar-track { background: transparent; }
+  .output-body::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+
+  /* ── ATS Score display ─────────────────────────────────────────── */
+  .ats-grid {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 28px;
+    align-items: start;
+    padding: 24px;
+  }
+  @media (max-width: 600px) { .ats-grid { grid-template-columns: 1fr; } }
+
+  .score-ring {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .score-number {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .score-label { font-size: 0.7rem; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .ats-details { padding: 4px 0; }
+  .ats-summary { font-size: 0.85rem; color: var(--sub); margin-bottom: 16px; line-height: 1.7; }
+
+  .issue-list { display: flex; flex-direction: column; gap: 8px; }
+  .issue-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 0.82rem;
+  }
+  .issue-badge {
+    flex-shrink: 0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+  }
+  .badge-high   { background: rgba(240,96,96,0.15); color: var(--danger); }
+  .badge-medium { background: rgba(240,160,96,0.15); color: var(--accent3); }
+  .badge-low    { background: rgba(96,200,240,0.12); color: var(--accent2); }
+
+  .issue-content { flex: 1; }
+  .issue-text { color: var(--text); margin-bottom: 4px; }
+  .issue-fix  { color: var(--sub); font-size: 0.78rem; font-style: italic; }
+
+  .kw-section { margin-top: 16px; }
+  .kw-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .kw-chip {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .kw-found   { background: rgba(200,240,96,0.1); color: var(--accent); border: 1px solid rgba(200,240,96,0.2); }
+  .kw-missing { background: rgba(240,96,96,0.08); color: var(--danger); border: 1px solid rgba(240,96,96,0.15); }
+
+  .strengths-list { list-style: none; margin: 8px 0 0; }
+  .strengths-list li {
+    padding: 6px 0 6px 18px;
+    position: relative;
+    font-size: 0.83rem;
+    color: var(--sub);
+    border-bottom: 1px solid var(--border);
+  }
+  .strengths-list li:last-child { border-bottom: none; }
+  .strengths-list li::before {
+    content: '✓';
+    position: absolute; left: 0;
+    color: var(--accent);
+    font-size: 0.75rem;
+  }
+
+  /* ── Section title ─────────────────────────────────────────────── */
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .section-sub { color: var(--sub); font-size: 0.85rem; margin-bottom: 28px; }
+
+  /* ── Tone chips ────────────────────────────────────────────────── */
+  .tone-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .tone-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--sub);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Outfit', sans-serif;
+  }
+  .tone-chip.selected, .tone-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,240,96,0.06);
+  }
+
+  /* ── Status pill ───────────────────────────────────────────────── */
+  .status-pill {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-pill.ok   { background: rgba(200,240,96,0.1); color: var(--accent); }
+  .status-pill.err  { background: rgba(240,96,96,0.1); color: var(--danger); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .status-dot.pulse { animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── Footer ────────────────────────────────────────────────────── */
+  footer {
+    margin-top: 80px;
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  /* ── Error msg ─────────────────────────────────────────────────── */
+  .error-msg {
+    background: rgba(240,96,96,0.08);
+    border: 1px solid rgba(240,96,96,0.2);
+    color: var(--danger);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.83rem;
+    margin-top: 16px;
+    display: none;
+  }
+  .error-msg.visible { display: block; }
+
+  /* ── API badge ──────────────────────────────────────────────────── */
+  .api-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    margin-bottom: 36px;
+    font-size: 0.78rem;
+    color: var(--sub);
+    font-family: 'DM Mono', monospace;
+  }
+  .api-badge-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">Resume<span class="logo-dot">AI</span></div>
+    <div class="tagline">Powered by Claude Haiku · Anthropic API</div>
+  </header>
+
+  <!-- API badge -->
+  <div class="api-badge">
+    <span class="api-badge-dot"></span>
+    Powered by Claude Haiku · Anthropic API
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('analyze', this)">📊 ATS Analyze</button>
+    <button class="tab" onclick="switchTab('optimize', this)">✨ Optimize</button>
+    <button class="tab" onclick="switchTab('cover', this)">✉️ Cover Letter</button>
+  </div>
+
+  <!-- ══ PANEL: ANALYZE ══════════════════════════════════════════════ -->
+  <div class="panel active" id="panel-analyze">
+    <div class="section-title">ATS Score & Analysis</div>
+    <div class="section-sub">Paste your resume or upload a PDF, optionally add a job description for targeted analysis.</div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-label">Resume</div>
+        <div class="drop-zone" id="dropzone-analyze" onclick="document.getElementById('pdf-analyze').click()">
+          <input type="file" id="pdf-analyze" accept=".pdf" onchange="handlePdfUpload(this, 'resume-analyze')" />
+          <div class="drop-icon">📄</div>
+          <div class="drop-text">Drop PDF or <span>click to upload</span></div>
+          <div class="drop-filename" id="filename-analyze"></div>
+        </div>
+        <div style="text-align:center;color:var(--muted);font-size:0.75rem;margin:10px 0">— or paste text —</div>
+        <textarea id="resume-analyze" rows="10" placeholder="Paste your resume text here..."></textarea>
+      </div>
+      <div class="card">
+        <div class="card-label">Job Description (optional)</div>
+        <textarea id="jd-analyze" rows="14" placeholder="Paste the job posting here for keyword matching and targeted feedback..."></textarea>
+      </div>
+    </div>
+
+    <div class="error-msg" id="err-analyze"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-analyze" onclick="runAnalyze()">
+        <span>Analyze Resume</span>
+      </button>
+    </div>
+
+    <!-- ATS Result -->
+    <div class="output-card" id="ats-result">
+      <div class="output-header">
+        <span class="output-title">Analysis Results</span>
+        <div class="output-actions">
+          <button class="btn-icon" onclick="copyAtsText()">Copy Report</button>
+        </div>
+      </div>
+      <div class="ats-grid" id="ats-grid-content"></div>
+    </div>
+  </div>
+
+  <!-- ══ PANEL: OPTIMIZE ════════════════════════════════════════════ -->
+  <div class="panel" id="panel-optimize">
+    <div class="section-title">Resume Optimizer</div>
+    <div class="section-sub">AI rewrites your resume with stronger verbs, better structure, and ATS-friendly formatting.</div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-label">Resume</div>
+        <div class="drop-zone" onclick="document.getElementById('pdf-optimize').click()">
+          <input type="file" id="pdf-optimize" accept=".pdf" onchange="handlePdfUpload(this, 'resume-optimize')" />
+          <div class="drop-icon">📄</div>
+          <div class="drop-text">Drop PDF or <span>click to upload</span></div>
+          <div class="drop-filename" id="filename-optimize"></div>
+        </div>
+        <div style="text-align:center;color:var(--muted);font-size:0.75rem;margin:10px 0">— or paste text —</div>
+        <textarea id="resume-optimize" rows="8" placeholder="Paste your resume text..."></textarea>
+      </div>
+      <div class="card">
+        <div class="card-label">Job Description (optional)</div>
+        <textarea id="jd-optimize" rows="8" placeholder="Adding a job description helps target the optimization..."></textarea>
+        <div class="card-label" style="margin-top:16px">Writing Tone</div>
+        <div class="tone-chips" id="tone-chips">
+          <button class="tone-chip selected" data-tone="professional and impactful">Professional</button>
+          <button class="tone-chip" data-tone="concise and results-focused">Results-focused</button>
+          <button class="tone-chip" data-tone="technical and detail-oriented">Technical</button>
+          <button class="tone-chip" data-tone="creative and dynamic">Creative</button>
+          <button class="tone-chip" data-tone="executive and strategic">Executive</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="err-optimize"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-optimize" onclick="runOptimize()">
+        <span>Optimize Resume</span>
+      </button>
+    </div>
+
+    <div class="output-card" id="out-optimize">
+      <div class="output-header">
+        <span class="output-title">Optimized Resume</span>
+        <div class="output-actions">
+          <button class="btn-icon" onclick="copyOutput('out-optimize-body')">Copy</button>
+          <button class="btn-icon" onclick="sendToAnalyze()">→ Analyze this</button>
+        </div>
+      </div>
+      <div class="output-body" id="out-optimize-body"></div>
+    </div>
+  </div>
+
+  <!-- ══ PANEL: COVER LETTER ════════════════════════════════════════ -->
+  <div class="panel" id="panel-cover">
+    <div class="section-title">Cover Letter Generator</div>
+    <div class="section-sub">Generate a tailored, non-generic cover letter based on your resume and the job posting.</div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-label">Resume</div>
+        <div class="drop-zone" onclick="document.getElementById('pdf-cover').click()">
+          <input type="file" id="pdf-cover" accept=".pdf" onchange="handlePdfUpload(this, 'resume-cover')" />
+          <div class="drop-icon">📄</div>
+          <div class="drop-text">Drop PDF or <span>click to upload</span></div>
+          <div class="drop-filename" id="filename-cover"></div>
+        </div>
+        <div style="text-align:center;color:var(--muted);font-size:0.75rem;margin:10px 0">— or paste text —</div>
+        <textarea id="resume-cover" rows="8" placeholder="Paste your resume text..."></textarea>
+      </div>
+      <div class="card">
+        <div class="card-label">Job Description *</div>
+        <textarea id="jd-cover" rows="7" placeholder="Paste the job description (required for cover letter)..."></textarea>
+        <div class="card-label" style="margin-top:14px">Company Name</div>
+        <input type="text" id="company-cover" placeholder="e.g. Acme Corp" style="padding:10px 14px;font-family:'Outfit',sans-serif;font-size:0.85rem;" />
+        <div class="card-label" style="margin-top:14px">Letter Tone</div>
+        <div class="tone-chips" id="cover-tone-chips">
+          <button class="tone-chip selected" data-tone="professional yet personable">Professional</button>
+          <button class="tone-chip" data-tone="enthusiastic and energetic">Enthusiastic</button>
+          <button class="tone-chip" data-tone="formal and structured">Formal</button>
+          <button class="tone-chip" data-tone="creative and distinctive">Creative</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="err-cover"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-cover" onclick="runCoverLetter()">
+        <span>Generate Cover Letter</span>
+      </button>
+    </div>
+
+    <div class="output-card" id="out-cover">
+      <div class="output-header">
+        <span class="output-title">Cover Letter</span>
+        <div class="output-actions">
+          <button class="btn-icon" onclick="copyOutput('out-cover-body')">Copy</button>
+        </div>
+      </div>
+      <div class="output-body" id="out-cover-body"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="wrap">ResumeAI · Powered by Claude Haiku (Anthropic)</div>
+</footer>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+let selectedTone = { optimize: "professional and impactful", cover: "professional yet personable" };
+
+function getBackend() { return ""; } // relative paths — works on Vercel
+
+// ── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── Tone chips ───────────────────────────────────────────────────────────────
+document.getElementById('tone-chips').addEventListener('click', e => {
+  if (!e.target.classList.contains('tone-chip')) return;
+  document.querySelectorAll('#tone-chips .tone-chip').forEach(c => c.classList.remove('selected'));
+  e.target.classList.add('selected');
+  selectedTone.optimize = e.target.dataset.tone;
+});
+document.getElementById('cover-tone-chips').addEventListener('click', e => {
+  if (!e.target.classList.contains('tone-chip')) return;
+  document.querySelectorAll('#cover-tone-chips .tone-chip').forEach(c => c.classList.remove('selected'));
+  e.target.classList.add('selected');
+  selectedTone.cover = e.target.dataset.tone;
+});
+
+// ── Drag & drop ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.drop-zone').forEach(zone => {
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'application/pdf') {
+      const input = zone.querySelector('input[type=file]');
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      input.dispatchEvent(new Event('change'));
+    }
+  });
+});
+
+// ── PDF Upload ───────────────────────────────────────────────────────────────
+async function handlePdfUpload(input, targetId) {
+  const file = input.files[0];
+  if (!file) return;
+  const panel = targetId.split('-')[1];
+  const fn = document.getElementById('filename-' + panel);
+  if (fn) fn.textContent = '⏳ Parsing ' + file.name + '...';
+
+  const form = new FormData();
+  form.append('pdf', file);
+  try {
+    const res = await fetch(getBackend() + '/api/parse-pdf', { method: 'POST', body: form });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    document.getElementById(targetId).value = data.text;
+    if (fn) fn.textContent = '✓ ' + file.name;
+  } catch (err) {
+    if (fn) fn.textContent = '⚠ ' + err.message;
+  }
+}
+
+
+// ── Show/hide error ──────────────────────────────────────────────────────────
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.classList.add('visible');
+}
+function hideError(id) { document.getElementById(id).classList.remove('visible'); }
+
+// ── Set loading state ────────────────────────────────────────────────────────
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (loading) {
+    btn._orig = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span><span>Working...</span>';
+    btn.disabled = true;
+  } else {
+    btn.innerHTML = btn._orig;
+    btn.disabled = false;
+  }
+}
+
+// ── Stream SSE to element ────────────────────────────────────────────────────
+async function streamToElement(url, body, elId, outputCardId) {
+  const outCard = document.getElementById(outputCardId);
+  const outEl = document.getElementById(elId);
+  outCard.classList.add('visible');
+  outEl.textContent = '';
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Server error');
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const lines = decoder.decode(value).split('\n');
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      try {
+        const d = JSON.parse(line.slice(6));
+        if (d.token) { outEl.textContent += d.token; outEl.scrollTop = outEl.scrollHeight; }
+      } catch {}
+    }
+  }
+}
+
+// ── ANALYZE ──────────────────────────────────────────────────────────────────
+async function runAnalyze() {
+  const resumeText = document.getElementById('resume-analyze').value.trim();
+  const jobDescription = document.getElementById('jd-analyze').value.trim();
+  hideError('err-analyze');
+  if (!resumeText) { showError('err-analyze', 'Please paste your resume text or upload a PDF.'); return; }
+  setLoading('btn-analyze', true);
+  try {
+    const res = await fetch(getBackend() + '/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resumeText, jobDescription }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    renderAts(data);
+  } catch (err) {
+    showError('err-analyze', 'Error: ' + err.message);
+  } finally {
+    setLoading('btn-analyze', false);
+  }
+}
+
+function renderAts(d) {
+  const score = d.ats_score || 0;
+  const color = score >= 75 ? 'var(--accent)' : score >= 50 ? 'var(--accent3)' : 'var(--danger)';
+  const r = 58, circ = 2 * Math.PI * r;
+  const dash = (score / 100) * circ;
+
+  const issuesHtml = (d.issues || []).map(i => `
+    <div class="issue-item">
+      <span class="issue-badge badge-${i.severity}">${i.severity}</span>
+      <div class="issue-content">
+        <div class="issue-text">${i.issue}</div>
+        <div class="issue-fix">→ ${i.fix}</div>
+      </div>
+    </div>`).join('');
+
+  const foundHtml = (d.keywords_found || []).map(k => `<span class="kw-chip kw-found">${k}</span>`).join('');
+  const missingHtml = (d.keywords_missing || []).map(k => `<span class="kw-chip kw-missing">${k}</span>`).join('');
+  const strengthsHtml = (d.strengths || []).map(s => `<li>${s}</li>`).join('');
+
+  document.getElementById('ats-grid-content').innerHTML = `
+    <div>
+      <div class="score-ring">
+        <svg width="150" height="150" viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="${r}" fill="none" stroke="var(--border)" stroke-width="10"/>
+          <circle cx="75" cy="75" r="${r}" fill="none" stroke="${color}" stroke-width="10"
+            stroke-dasharray="${dash} ${circ}" stroke-linecap="round"
+            style="transition:stroke-dasharray 1s ease"/>
+        </svg>
+        <div class="score-ring-text">
+          <span class="score-number" style="color:${color}">${score}</span>
+          <span class="score-label">ATS Score</span>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px">
+        <span style="font-family:'Fraunces',serif;font-size:1.6rem;color:${color}">${d.overall_grade || '—'}</span>
+        <div style="font-size:0.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:0.1em">Grade</div>
+      </div>
+      ${strengthsHtml ? `<div style="margin-top:20px"><div class="card-label">Strengths</div><ul class="strengths-list">${strengthsHtml}</ul></div>` : ''}
+    </div>
+    <div class="ats-details">
+      <div class="ats-summary">${d.summary || ''}</div>
+      ${issuesHtml ? `<div class="card-label">Issues to Fix</div><div class="issue-list">${issuesHtml}</div>` : ''}
+      ${(foundHtml || missingHtml) ? `
+        <div class="kw-section">
+          ${foundHtml ? `<div class="card-label">Keywords Found</div><div class="kw-row">${foundHtml}</div>` : ''}
+          ${missingHtml ? `<div class="card-label" style="margin-top:12px">Keywords Missing</div><div class="kw-row">${missingHtml}</div>` : ''}
+        </div>` : ''}
+    </div>
+  `;
+  document.getElementById('ats-result').classList.add('visible');
+}
+
+// ── OPTIMIZE ─────────────────────────────────────────────────────────────────
+async function runOptimize() {
+  const resumeText = document.getElementById('resume-optimize').value.trim();
+  const jobDescription = document.getElementById('jd-optimize').value.trim();
+  hideError('err-optimize');
+  if (!resumeText) { showError('err-optimize', 'Please paste your resume text or upload a PDF.'); return; }
+  setLoading('btn-optimize', true);
+  try {
+    await streamToElement(
+      getBackend() + '/api/optimize',
+      { resumeText, jobDescription, tone: selectedTone.optimize },
+      'out-optimize-body', 'out-optimize'
+    );
+  } catch (err) {
+    showError('err-optimize', 'Error: ' + err.message);
+  } finally {
+    setLoading('btn-optimize', false);
+  }
+}
+
+// ── COVER LETTER ─────────────────────────────────────────────────────────────
+async function runCoverLetter() {
+  const resumeText = document.getElementById('resume-cover').value.trim();
+  const jobDescription = document.getElementById('jd-cover').value.trim();
+  const companyName = document.getElementById('company-cover').value.trim();
+  hideError('err-cover');
+  if (!resumeText) { showError('err-cover', 'Please paste your resume text or upload a PDF.'); return; }
+  if (!jobDescription) { showError('err-cover', 'Job description is required to generate a cover letter.'); return; }
+  setLoading('btn-cover', true);
+  try {
+    await streamToElement(
+      getBackend() + '/api/cover-letter',
+      { resumeText, jobDescription, companyName, tone: selectedTone.cover },
+      'out-cover-body', 'out-cover'
+    );
+  } catch (err) {
+    showError('err-cover', 'Error: ' + err.message);
+  } finally {
+    setLoading('btn-cover', false);
+  }
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function copyOutput(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
+}
+function sendToAnalyze() {
+  const text = document.getElementById('out-optimize-body').textContent;
+  document.getElementById('resume-analyze').value = text;
+  switchTab('analyze', document.querySelectorAll('.tab')[0]);
+}
+function copyAtsText() {
+  const grid = document.getElementById('ats-grid-content');
+  navigator.clipboard.writeText(grid.innerText).then(() => alert('Copied!'));
+}
+
+
+</script>
+</body>
+</html>
