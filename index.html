@@ -498,9 +498,9 @@
       <div class="card">
         <div class="card-label">Resume</div>
         <div class="drop-zone" id="dropzone-analyze" onclick="document.getElementById('pdf-analyze').click()">
-          <input type="file" id="pdf-analyze" accept=".pdf" onchange="handlePdfUpload(this, 'resume-analyze')" />
+          <input type="file" id="pdf-analyze" accept=".pdf,.docx" onchange="handlePdfUpload(this, 'resume-analyze')" />
           <div class="drop-icon">📄</div>
-          <div class="drop-text">Drop PDF or <span>click to upload</span></div>
+          <div class="drop-text">Drop PDF/DOCX or <span>click to upload</span></div>
           <div class="drop-filename" id="filename-analyze"></div>
         </div>
         <div style="text-align:center;color:var(--muted);font-size:0.75rem;margin:10px 0">— or paste text —</div>
@@ -541,9 +541,9 @@
       <div class="card">
         <div class="card-label">Resume</div>
         <div class="drop-zone" onclick="document.getElementById('pdf-optimize').click()">
-          <input type="file" id="pdf-optimize" accept=".pdf" onchange="handlePdfUpload(this, 'resume-optimize')" />
+          <input type="file" id="pdf-optimize" accept=".pdf,.docx" onchange="handlePdfUpload(this, 'resume-optimize')" />
           <div class="drop-icon">📄</div>
-          <div class="drop-text">Drop PDF or <span>click to upload</span></div>
+          <div class="drop-text">Drop PDF/DOCX or <span>click to upload</span></div>
           <div class="drop-filename" id="filename-optimize"></div>
         </div>
         <div style="text-align:center;color:var(--muted);font-size:0.75rem;margin:10px 0">— or paste text —</div>
@@ -592,9 +592,9 @@
       <div class="card">
         <div class="card-label">Resume</div>
         <div class="drop-zone" onclick="document.getElementById('pdf-cover').click()">
-          <input type="file" id="pdf-cover" accept=".pdf" onchange="handlePdfUpload(this, 'resume-cover')" />
+          <input type="file" id="pdf-cover" accept=".pdf,.docx" onchange="handlePdfUpload(this, 'resume-cover')" />
           <div class="drop-icon">📄</div>
-          <div class="drop-text">Drop PDF or <span>click to upload</span></div>
+          <div class="drop-text">Drop PDF/DOCX or <span>click to upload</span></div>
           <div class="drop-filename" id="filename-cover"></div>
         </div>
         <div style="text-align:center;color:var(--muted);font-size:0.75rem;margin:10px 0">— or paste text —</div>
@@ -676,7 +676,8 @@ document.querySelectorAll('.drop-zone').forEach(zone => {
     e.preventDefault();
     zone.classList.remove('drag');
     const file = e.dataTransfer.files[0];
-    if (file && file.type === 'application/pdf') {
+    const allowed = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (file && (allowed.includes(file.type) || file.name.endsWith('.docx'))) {
       const input = zone.querySelector('input[type=file]');
       const dt = new DataTransfer();
       dt.items.add(file);
